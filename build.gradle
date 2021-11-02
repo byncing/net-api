@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'eu.byncing'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    extraLibs
+}
+
+dependencies {
+    extraLibs('com.google.code.gson:gson:2.8.9')
+
+    configurations.implementation.extendsFrom(configurations.extraLibs)
+}
+
+jar {
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
