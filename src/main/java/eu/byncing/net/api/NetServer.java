@@ -1,84 +1,46 @@
 package eu.byncing.net.api;
 
-import eu.byncing.net.api.channel.ChannelPipeline;
 import eu.byncing.net.api.channel.IChannel;
 import eu.byncing.net.api.channel.IChannelInitializer;
-import eu.byncing.net.api.channel.NetChannel;
 import eu.byncing.net.api.protocol.Packet;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.SocketAddress;
-import java.util.ArrayList;
 import java.util.List;
 
 public class NetServer implements INetStructure {
 
-    private ServerSocket socket;
-
-    private boolean connected;
-
-    private final List<IChannel> channels = new ArrayList<>();
-
-    private final ChannelPipeline pipeline = new ChannelPipeline();
-
-    private IChannelInitializer initializer;
+    private final NetWorker worker;
 
     public NetServer() {
-        try {
-            this.socket = new ServerSocket();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.worker = new NetWorker();
     }
 
     public void bind(InetSocketAddress address) throws IOException {
-        socket.bind(address);
-        if (getOption(NetOption.TIMEOUT) > 0) socket.setSoTimeout(getOption(NetOption.TIMEOUT));
-        connected = true;
-        new Thread(() -> {
-            while (connected) {
-                try {
-                    NetChannel channel = new NetChannel(this, socket.accept());
-                    channels.add(channel);
-                    if (initializer != null) initializer.initChannel(channel);
-                    channel.getPipeline().getHandler().handleConnected(channel);
-                    channel.start();
-                } catch (IOException e) {
-                    pipeline.getHandler().handleException(e);
-                    close();
-                }
-            }
-        }).start();
+        worker.bind(address);
     }
 
     @Override
     public void close() {
-        try {
-            connected = false;
-            for (int i = channels.size() - 1; i >= 0; i--) channels.get(i).close();
-            socket.close();
-        } catch (IOException e) {
-            pipeline.getHandler().handleException(e);
-        }
+        worker.close();
     }
 
     @Override
     public void sendPacket(Packet packet) {
-        for (int i = channels.size() - 1; i >= 0; i--) channels.get(i).sendPacket(packet);
+        worker.sendPacket(packet);
     }
 
     @Override
     public NetServer init(IChannelInitializer initializer) {
-        this.initializer = initializer;
+        worker.init(initializer);
         return this;
     }
 
     @Override
     public NetServer option(NetOption<?> option, Object value) {
-        option.setValue(value);
+        worker.option(option, value);
         return this;
     }
 
@@ -89,22 +51,22 @@ public class NetServer implements INetStructure {
 
     @Override
     public boolean isConnected() {
-        return connected;
+        return worker.isConnected();
     }
 
     public InetAddress getInetAddress() {
-        return socket.getInetAddress();
+        return worker.getInetAddress();
     }
 
     public SocketAddress getLocalSocketAddress() {
-        return socket.getLocalSocketAddress();
+        return worker.getLocalSocketAddress();
     }
 
     public int getPort() {
-        return socket.getLocalPort();
+        return worker.getPort();
     }
 
     public List<IChannel> getChannels() {
-        return channels;
+        return worker.getChannels();
     }
 }
