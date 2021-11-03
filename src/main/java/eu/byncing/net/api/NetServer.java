@@ -46,7 +46,7 @@ public class NetServer implements INetStructure {
 
     @Override
     public <T> T getOption(NetOption<T> option) {
-        return option.value;
+        return worker.getOption(option);
     }
 
     @Override
