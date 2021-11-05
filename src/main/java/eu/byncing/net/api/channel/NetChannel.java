@@ -82,7 +82,7 @@ public class NetChannel implements IChannel, Runnable {
             if (socket != null && connected) {
                 connected = false;
                 socket.close();
-                if (structure instanceof NetServer server) server.getChannels().remove(this);
+                if (structure instanceof NetServer) ((NetServer) structure).getChannels().remove(this);
                 pipeline.getHandler().handleDisconnected(this);
             }
         } catch (IOException e) {
