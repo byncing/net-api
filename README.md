@@ -4,7 +4,7 @@ A simple network library for dealing with sockets
 
 # Installation
 
-### Gradle:
+### Gradle
 
 ````gradle
 repositories {
