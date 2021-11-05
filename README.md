@@ -143,7 +143,8 @@ public class Client {
 
                     @Override
                     public void handlePacket(IChannel channel, Packet packet) {
-                        if (packet instanceof PacketExample example) {
+                        if (packet instanceof PacketExample) {
+                            PacketExample example = (PacketExample) example;
                             System.out.println("[Client] Channel" + channel.getRemoteAddress() + " Channel data: name " + example.getName() + ", country " + example.getCountry() + ", age " + example.getAge());
                         }
                     }
