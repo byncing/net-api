@@ -18,7 +18,7 @@ dependencies {
 ````
 # Example
 
-### Packet:
+### Packet
 
 ````java
 package eu.byncing.net.example;
@@ -67,7 +67,7 @@ public class PacketExample extends Packet {
 }
 ````
 
-### Server:
+### Server
 
 ```java
 package eu.byncing.net.example.server;
@@ -112,7 +112,7 @@ public class Server {
 ```
 
 
-### Client:
+### Client
 ```java
 package eu.byncing.net.example.client;
 
