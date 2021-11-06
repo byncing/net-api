@@ -2,7 +2,6 @@ package eu.byncing.net.api.protocol;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.nio.charset.StandardCharsets;
@@ -15,7 +14,7 @@ public class PacketBuffer implements IPacketBuffer {
     private final JsonObject object;
 
     public PacketBuffer(byte[] bytes) {
-        this.object = JsonParser.parseString(new String(bytes)).getAsJsonObject();
+        this.object = gson.fromJson(new String(bytes), JsonObject.class);
     }
 
     public PacketBuffer() {
