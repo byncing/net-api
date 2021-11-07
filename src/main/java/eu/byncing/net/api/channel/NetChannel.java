@@ -37,7 +37,6 @@ public class NetChannel implements IChannel, Runnable {
     public NetChannel(INetStructure structure) {
         this.structure = structure;
         this.socket = new Socket();
-        this.connected = true;
     }
 
     public void connect(SocketAddress address) throws IOException {
