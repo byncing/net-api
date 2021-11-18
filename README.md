@@ -9,7 +9,7 @@ A simple network library for dealing with sockets
 ````gradle
 repositories {
     mavenCentral()
-    maven { url('https://byncing.eu/repository/snapshots/') }
+    maven { url('https://byncing.eu/repository/') }
 }
 
 dependencies {
