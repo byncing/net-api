@@ -5,6 +5,7 @@ import eu.byncing.net.api.channel.NettyChannel;
 import eu.byncing.net.api.protocol.VarInt21FrameDecoder;
 import eu.byncing.net.api.protocol.VarInt21LengthFieldPrepender;
 import eu.byncing.net.api.protocol.packet.EmptyPacket;
+import eu.byncing.net.api.protocol.packet.PacketRegistry;
 import eu.byncing.net.api.protocol.packet.codec.PacketDecoder;
 import eu.byncing.net.api.protocol.packet.codec.PacketEncoder;
 import io.netty.bootstrap.Bootstrap;
@@ -20,6 +21,8 @@ import java.util.List;
 public class NetClient implements INetStructure {
 
     private final List<INetListener> listeners = new ArrayList<>();
+
+    private final PacketRegistry packetRegistry = new PacketRegistry();
 
     private INetChannel channel;
 
@@ -54,7 +57,7 @@ public class NetClient implements INetStructure {
 
                                 @Override
                                 protected void channelRead0(ChannelHandlerContext ctx, EmptyPacket msg) {
-                                    getListeners().forEach(listener -> listener.handlePacket(channel, msg));
+                                    packetRegistry.process(channel, msg);
                                 }
 
                                 @Override
@@ -96,6 +99,11 @@ public class NetClient implements INetStructure {
     @Override
     public Collection<INetListener> getListeners() {
         return listeners;
+    }
+
+    @Override
+    public PacketRegistry getPacketRegistry() {
+        return packetRegistry;
     }
 
     public INetChannel getChannel() {
