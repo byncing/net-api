@@ -14,7 +14,7 @@ configurations {
 }
 
 dependencies {
-    extraLibs('com.google.code.gson:gson:2.8.9')
+    extraLibs('io.netty:netty-all:4.1.45.Final')
 
     configurations.implementation.extendsFrom(configurations.extraLibs)
 }
