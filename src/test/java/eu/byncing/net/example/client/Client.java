@@ -1,24 +1,32 @@
 package eu.byncing.net.example.client;
 
+import eu.byncing.net.api.INetListener;
+import eu.byncing.net.api.channel.INetChannel;
+import eu.byncing.net.api.protocol.packet.EmptyPacket;
 import eu.byncing.net.api.NetClient;
-import eu.byncing.net.api.channel.ChannelPipeline;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
+import eu.byncing.net.example.PacketExample;
 
 public class Client {
 
     public static void main(String[] args) {
-        try {
-            NetClient client = new NetClient();
-            client.init(channel -> {
-                System.out.println("[Client] Channel" + channel.getRemoteAddress() + " has initialized.");
+        NetClient client = new NetClient();
+        client.addListener(new INetListener() {
+            @Override
+            public void handleConnected(INetChannel channel) {
+                System.out.println("[Client] Channel" + channel.getSocket().remoteAddress() + " has connected.");
 
-                ChannelPipeline pipeline = channel.getPipeline();
-                pipeline.handle(new ClientHandler());
-            }).connect(new InetSocketAddress("127.0.0.1", 25565));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                channel.sendPacket(new PacketExample("byncing", "Germany", 19));
+            }
+
+            @Override
+            public void handleDisconnected(INetChannel channel) {
+                System.out.println("[Client] Channel" + channel.getSocket().remoteAddress() + " has disconnected.");
+            }
+
+            @Override
+            public void handlePacket(INetChannel channel, EmptyPacket packet) {
+
+            }
+        }).connect("127.0.0.1", 3000);
     }
 }
