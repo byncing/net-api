@@ -3,6 +3,7 @@ package eu.byncing.net.example.client;
 import eu.byncing.net.api.INetListener;
 import eu.byncing.net.api.NetClient;
 import eu.byncing.net.api.channel.INetChannel;
+import eu.byncing.net.api.protocol.packet.EmptyPacket;
 import eu.byncing.net.example.PacketExample;
 
 public class Client {
@@ -20,6 +21,10 @@ public class Client {
             @Override
             public void handleDisconnected(INetChannel channel) {
                 System.out.println("[Client] Channel" + channel.getSocket().remoteAddress() + " has disconnected.");
+            }
+
+            @Override
+            public void handlePacket(INetChannel channel, EmptyPacket packet) {
             }
         }).connect("127.0.0.1", 3000);
     }

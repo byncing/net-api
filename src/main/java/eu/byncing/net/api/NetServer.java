@@ -5,7 +5,6 @@ import eu.byncing.net.api.channel.NettyChannel;
 import eu.byncing.net.api.protocol.VarInt21FrameDecoder;
 import eu.byncing.net.api.protocol.VarInt21LengthFieldPrepender;
 import eu.byncing.net.api.protocol.packet.EmptyPacket;
-import eu.byncing.net.api.protocol.packet.PacketRegistry;
 import eu.byncing.net.api.protocol.packet.codec.PacketDecoder;
 import eu.byncing.net.api.protocol.packet.codec.PacketEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -24,8 +23,6 @@ public class NetServer implements INetStructure {
     private final List<INetListener> listeners = new ArrayList<>();
 
     private final Collection<INetChannel> channels = new ConcurrentLinkedQueue<>();
-
-    private final PacketRegistry packetRegistry = new PacketRegistry();
 
     private Channel channel;
 
@@ -52,7 +49,7 @@ public class NetServer implements INetStructure {
                                                 if (!isConnected()) return;
                                                 NettyChannel channel = new NettyChannel(ctx.channel());
                                                 getChannels().add(channel);
-                                                getListeners().forEach(listener -> listener.handleConnected(channel));
+                                                listeners.forEach(listener -> listener.handleConnected(channel));
                                             }
 
                                             @Override
@@ -61,7 +58,7 @@ public class NetServer implements INetStructure {
                                                 INetChannel channel = getChannel(ctx.channel());
                                                 if (channel == null) return;
                                                 getChannels().remove(channel);
-                                                getListeners().forEach(listener -> listener.handleDisconnected(channel));
+                                                listeners.forEach(listener -> listener.handleDisconnected(channel));
                                             }
 
                                             @Override
@@ -69,7 +66,7 @@ public class NetServer implements INetStructure {
                                                 if (!isConnected()) return;
                                                 INetChannel channel = getChannel(ctx.channel());
                                                 if (channel == null) return;
-                                                packetRegistry.process(channel, msg);
+                                                listeners.forEach(listener -> listener.handlePacket(channel, msg));
                                             }
 
                                             @Override
@@ -120,11 +117,6 @@ public class NetServer implements INetStructure {
     @Override
     public Collection<INetListener> getListeners() {
         return listeners;
-    }
-
-    @Override
-    public PacketRegistry getPacketRegistry() {
-        return packetRegistry;
     }
 
     public Collection<INetChannel> getChannels() {
