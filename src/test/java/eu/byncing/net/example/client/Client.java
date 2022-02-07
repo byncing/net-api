@@ -1,9 +1,9 @@
 package eu.byncing.net.example.client;
 
 import eu.byncing.net.api.INetListener;
+import eu.byncing.net.api.NetClient;
 import eu.byncing.net.api.channel.INetChannel;
 import eu.byncing.net.api.protocol.packet.EmptyPacket;
-import eu.byncing.net.api.NetClient;
 import eu.byncing.net.example.PacketExample;
 
 public class Client {
