@@ -5,7 +5,7 @@ A simple network library for dealing with sockets
 ````gradle
 repositories {
     maven {
-        url('http://repo.byncing.eu/snapshots')
+        url('http://repo.byncing.eu/snapshots/')
         allowInsecureProtocol(true)
     }
 }
