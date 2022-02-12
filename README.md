@@ -1,6 +1,19 @@
 # net-api
 
 A simple network library for dealing with sockets
+# Gradle
+````gradle
+repositories {
+    maven {
+        url('http://repo.byncing.eu/snapshots')
+        allowInsecureProtocol(true)
+    }
+}
+
+dependencies {
+    implementation('eu.byncing:net-api:1.0.0-SNAPSHOT')
+}
+````
 
 # Example
 
