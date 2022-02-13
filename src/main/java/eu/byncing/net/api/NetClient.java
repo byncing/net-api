@@ -24,52 +24,54 @@ public class NetClient implements INetStructure {
     private INetChannel channel;
 
     public void connect(String host, int port) {
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            Bootstrap b = new Bootstrap();
-            b.group(workerGroup);
-            b.channel(NioSocketChannel.class);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) {
-                    channel = new NettyChannel(ch);
-                    ch.pipeline().addLast(
-                            new VarInt21FrameDecoder(),
-                            new PacketDecoder(),
-                            new VarInt21LengthFieldPrepender(),
-                            new PacketEncoder(),
-                            new SimpleChannelInboundHandler<EmptyPacket>() {
-                                @Override
-                                public void channelActive(ChannelHandlerContext ctx) {
-                                    ctx.fireChannelActive();
-                                    getListeners().forEach(listener -> listener.handleConnected(channel));
-                                }
+        new Thread(() -> {
+            EventLoopGroup workerGroup = new NioEventLoopGroup();
+            try {
+                Bootstrap b = new Bootstrap();
+                b.group(workerGroup);
+                b.channel(NioSocketChannel.class);
+                b.option(ChannelOption.SO_KEEPALIVE, true);
+                b.handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) {
+                        channel = new NettyChannel(ch);
+                        ch.pipeline().addLast(
+                                new VarInt21FrameDecoder(),
+                                new PacketDecoder(),
+                                new VarInt21LengthFieldPrepender(),
+                                new PacketEncoder(),
+                                new SimpleChannelInboundHandler<EmptyPacket>() {
+                                    @Override
+                                    public void channelActive(ChannelHandlerContext ctx) {
+                                        ctx.fireChannelActive();
+                                        getListeners().forEach(listener -> listener.handleConnected(channel));
+                                    }
 
-                                @Override
-                                public void channelInactive(ChannelHandlerContext ctx) {
-                                    ctx.fireChannelInactive();
-                                    getListeners().forEach(listener -> listener.handleDisconnected(channel));
-                                }
+                                    @Override
+                                    public void channelInactive(ChannelHandlerContext ctx) {
+                                        ctx.fireChannelInactive();
+                                        getListeners().forEach(listener -> listener.handleDisconnected(channel));
+                                    }
 
-                                @Override
-                                protected void channelRead0(ChannelHandlerContext ctx, EmptyPacket msg) {
-                                    listeners.forEach(listener -> listener.handlePacket(channel, msg));
-                                }
+                                    @Override
+                                    protected void channelRead0(ChannelHandlerContext ctx, EmptyPacket msg) {
+                                        listeners.forEach(listener -> listener.handlePacket(channel, msg));
+                                    }
 
-                                @Override
-                                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-                                }
-                            });
-                }
-            });
-            ChannelFuture f = b.connect(host, port).sync();
-            f.channel().closeFuture().sync();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        } finally {
-            workerGroup.shutdownGracefully();
-        }
+                                    @Override
+                                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                                    }
+                                });
+                    }
+                });
+                ChannelFuture f = b.connect(host, port).sync();
+                f.channel().closeFuture().sync();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            } finally {
+                workerGroup.shutdownGracefully();
+            }
+        }).start();
     }
 
     @Override
